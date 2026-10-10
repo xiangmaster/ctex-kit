@@ -58,7 +58,7 @@ env:
 jobs:
   # ── 阶段 A: 生成英文 announcement ──────────────────────────────────────
   prepare-announcement:
-    if: github.repository == 'CTeX-org/ctex-kit'
+    if: github.repository == 'xiangmaster/ctex-kit'
     runs-on: ubuntu-latest
     outputs:
       pkg: ${{ steps.parse.outputs.pkg }}
@@ -267,7 +267,7 @@ jobs:
 
             写完后通过 structured_output 返回 announcement 全文.
           claude_args: |
-            --model opus --allowedTools "Read,Write,Bash(cat:*),Bash(ls:*),Bash(wc:*)"
+            --model claude-sonnet-4-6 --allowedTools "Read,Write,Bash(cat:*),Bash(ls:*),Bash(wc:*)"
             --json-schema '{"type":"object","properties":{"announcement":{"type":"string","description":"完整 announcement 英文文本"},"summary":{"type":"string","description":"一句话摘要 (给 GH Actions step summary 用)"}},"required":["announcement","summary"]}'
 
       - name: Verify announcement.md exists
@@ -307,7 +307,7 @@ jobs:
   # ── 阶段 B: l3build upload (从 GH Release zip 复用) ─────────────────────
   upload-ctan:
     needs: prepare-announcement
-    if: github.repository == 'CTeX-org/ctex-kit'
+    if: github.repository == 'xiangmaster/ctex-kit'
     runs-on: ubuntu-latest
     # Environment gate (仅 live mode 启用):
     # - dry_run=true ⟹ 不进 environment, 任意 collaborator 可跑测试
