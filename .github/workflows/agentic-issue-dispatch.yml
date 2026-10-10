@@ -15,7 +15,7 @@ permissions: {}
 jobs:
   prepare:
     name: Prepare Issue input
-    if: github.repository == 'CTeX-org/ctex-kit'
+    if: github.repository == 'xiangmaster/ctex-kit'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -166,7 +166,7 @@ jobs:
         uses: ./consumer/.github/actions/run-agent
         with:
           provider: claude
-          model: claude-opus-5-5
+          model: claude-sonnet-4-6
           api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           base_url: ${{ secrets.ANTHROPIC_BASE_URL }}
           workspace: ${{ github.workspace }}/consumer
@@ -183,7 +183,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/agent-result"
           bash "$TRUSTED_ANSWER_NORMALIZER" \
             "$RUNNER_TEMP/raw-result.json" "$RUNNER_TEMP/agent-result/result.json" \
-            claude claude-opus-5-5 issue-dispatch
+            claude claude-sonnet-4-6 issue-dispatch
 
       - name: Upload Claude analysis
         if: steps.validate.outcome == 'success'
@@ -222,7 +222,7 @@ jobs:
   codex_analyze:
     name: Analyze with Codex (fallback)
     needs: [prepare, claude_analyze]
-    if: always() && github.repository == 'CTeX-org/ctex-kit' && needs.prepare.result == 'success' && needs.claude_analyze.outputs.status != 'success'
+    if: always() && github.repository == 'xiangmaster/ctex-kit' && needs.prepare.result == 'success' && needs.claude_analyze.outputs.status != 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
@@ -358,7 +358,7 @@ jobs:
   dispatch:
     name: dispatch
     needs: [prepare, claude_analyze, codex_analyze]
-    if: always() && github.repository == 'CTeX-org/ctex-kit'
+    if: always() && github.repository == 'xiangmaster/ctex-kit'
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -400,7 +400,7 @@ jobs:
             (.cost | IN("small", "medium", "large", "extra-large", "n/a")) and
             (.auto_fix_eligible | type == "boolean") and
             (.comment_body | type == "string" and length > 0 and length <= 60000) and
-            ((.reviewer == "claude" and .model == "claude-opus-5-5") or
+            ((.reviewer == "claude" and .model == "claude-sonnet-4-6") or
              (.reviewer == "codex" and .model == "gpt-6.1-sol"))
           ' "$RESULT_FILE" > /dev/null
 
@@ -449,7 +449,7 @@ jobs:
   notify:
     name: Notify Issue analysis
     needs: dispatch
-    if: always() && github.repository == 'CTeX-org/ctex-kit'
+    if: always() && github.repository == 'xiangmaster/ctex-kit'
     runs-on: ubuntu-latest
     permissions:
       contents: read
